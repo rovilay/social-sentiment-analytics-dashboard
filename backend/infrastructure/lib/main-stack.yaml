@@ -1,0 +1,83 @@
+Parameters:
+  BucketName:
+    Type: String
+    Description: Unique name for the S3 bucket
+    Default: tweet-sentiment-analytics-74f90b7a-236a-4d62
+  BucketURL:
+    Type: String
+    Description: S3 bucket URL
+    Default: https://tweet-sentiment-analytics-74f90b7a-236a-4d62.s3.us-east-1.amazonaws.com
+  TwitterAPISecret:
+    Type: String
+    Description: Twitter credentials
+    Default: arn:aws:secretsmanager:us-east-1:122610488400:secret:tweet-sentiment-twitter-api-keys-jTbDmL
+
+Resources:
+  # TwitterAPISecret:
+  #   Type: 'AWS::SecretsManager::Secret'
+  #   Properties:
+  #     Name: tweet-sentiment-twitter-api-keys
+
+  # S3BucketStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub s3://${BucketName}/infrastructure/s3-bucket.yaml
+
+  # IAMRolesStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub
+  #       - ${BucketURL}/infrastructure/iam-roles.yaml
+  #       - BucketURL: !Ref BucketURL
+  #     Parameters:
+  #       BucketName: !Ref BucketName
+  #       TwitterAPISecret: !Ref TwitterAPISecret
+
+    # DependsOn:
+    #   - S3BucketStack
+
+  # EventBridgeRuleStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub
+  #       - ${BucketURL}/infrastructure/eventbridge-rule.yaml
+  #       - BucketURL: !Ref BucketURL
+  #   DependsOn:
+  #     - DataCollectionFunctionStack
+  
+  DataCollectionFunctionStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/data-collection-function.yaml
+        - BucketURL: !Ref BucketURL
+      Parameters:
+        BucketName: !Ref BucketName
+        TwitterAPISecret: !Ref TwitterAPISecret
+  
+  DynamoDBTableStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/dynamodb-table.yaml
+        - BucketURL: !Ref BucketURL
+
+  KinesisDataStreamStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/kinesis-data-stream.yaml
+        - BucketURL: !Ref BucketURL
+  
+  SentimentAnalysisFunctionStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/sentiment-analysis-function.yaml
+        - BucketURL: !Ref BucketURL
+      Parameters:
+        BucketName: !Ref BucketName
+      #   SentimentDataTableArn: !ImportValue DynamoDBTableStack-SentimentDataTableArn
+    DependsOn:
+      - DynamoDBTableStack
+      - KinesisDataStreamStack

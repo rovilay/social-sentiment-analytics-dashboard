@@ -1,0 +1,27 @@
+Resources:
+  SentimentDataTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: SentimentDataTable
+      AttributeDefinitions:
+        - 
+          AttributeName: TweetId
+          AttributeType: S
+      KeySchema:
+        - 
+          AttributeName: TweetId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+Outputs:
+  SentimentDataTableName:
+    Value: !Ref SentimentDataTable
+    Description: Name of the Sentiment data table
+    Export:
+      Name: !Sub '${AWS::StackName}-SentimentDataTableName'
+  SentimentDataTableArn:
+    Value: !GetAtt SentimentDataTable.Arn
+    Description: ARN of the Sentiment data table
+    Export: 
+      Name: !Sub '${AWS::StackName}-SentimentDataTableArn'

@@ -1,0 +1,67 @@
+Parameters:
+  BucketName:
+    Type: String
+    Description: Unique name for the S3 bucket
+    Default: tweet-sentiment-analytics-74f90b7a-236a-4d62
+  SentimentDataTableName:
+    Type: String
+  #   Default:
+  #     Fn::ImportValue: 'DynamoDBTableStack-SentimentDataTableName'
+  SentimentDataTableArn:
+    Type: String
+  # TweetStreamArn:
+  #   Type: String
+  #   Default:
+  #     Fn::ImportValue: 'KinesisDataStreamStack-TweetStreamArn'
+Resources:
+  SentimentAnalysisRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ComprehendAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - comprehend:DetectSentiment
+                Resource: '*'
+        - PolicyName: DynamoDBAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                Resource: !ImportValue  DynamoDBTableStack-SentimentDataTableArn
+  SentimentAnalysisFunction:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - SentimentAnalysisRole
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Code:
+        ZipFile: !Sub s3://${BucketName}/data-collection-function.zip
+      MemorySize: 128
+      Timeout: 60
+      Role: !GetAtt SentimentAnalysisRole.Arn
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref SentimentDataTableName
+      # Events:
+      #   KinesisStreamTrigger:
+      #     Type: Kinesis
+      #     Properties:
+      #       Stream: !Ref TweetStreamArn
+      #       BatchSize: 100
+      #       StartingPosition: LATEST

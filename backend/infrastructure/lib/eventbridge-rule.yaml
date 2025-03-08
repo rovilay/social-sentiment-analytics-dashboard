@@ -1,0 +1,14 @@
+Resources:
+  ScheduledRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Name: SocialMediaDataIngestionRule
+      Description: 'Rule to trigger data ingestion every minute'
+      ScheduleExpression: 'rate(360 minute)'
+      State: 'ENABLED'
+      Roles:
+        - DataCollectionEventRole
+      Targets:
+        - 
+          Arn: !GetAtt DataCollectionFunction.Arn
+          Id: DataCollectionFunctionTarget
