@@ -1,0 +1,19 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: latest
+    commands:
+      - npm install -g pnpm
+      - pnpm install
+  pre_build:
+    commands:
+      - echo building modules...
+      - pnpm run build
+  build:
+    commands:
+      - echo Zipping the code...
+      - cd backend/data-collection
+      - zip -r data-collection-function.zip ./dist
+      - echo Uploading the code to S3...
+      - aws s3 cp data-collection-function.zip s3://your-bucket-name/data-collection-function.zip

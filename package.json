@@ -4,9 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prep:deploy": "concurrently 'pnpm run prep:deploy:data-collection' 'pnpm run prep:deploy:sentiment-analayis'",
+    "prep:deploy:data-collection": "cd backend/data-collection && pnpm run build:zip",
+    "prep:deploy:sentiment-analayis": "cd backend/sentiment-analysis && pnpm run build:zip",
+    "build": "concurrently 'pnpm run build:data-collection' 'pnpm run build:sentiment-analysis'",
+    "build:data-collection": "cd backend/data-collection && pnpm run build",
+    "build:sentiment-analysis": "cd backend/sentiment-analysis && pnpm run build"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
 }

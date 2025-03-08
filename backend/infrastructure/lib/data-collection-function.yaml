@@ -63,3 +63,13 @@ Resources:
               - Effect: 'Allow'
                 Action: 'lambda:InvokeFunction'
                 Resource: !GetAtt DataCollectionFunction.Arn
+Outputs:
+  DataCollectionFunctionArn:
+    Value: !GetAtt DataCollectionFunction.Arn
+    Export:
+      Name: DataCollectionFunctionArn
+  DataCollectionEventRoleArn:
+    Value: !GetAtt DataCollectionEventRole.Arn
+    Export:
+      Name: DataCollectionEventRoleArn
+

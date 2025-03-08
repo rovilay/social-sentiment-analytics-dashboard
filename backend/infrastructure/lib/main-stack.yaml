@@ -12,16 +12,7 @@ Parameters:
     Description: Twitter credentials
     Default: arn:aws:secretsmanager:us-east-1:122610488400:secret:tweet-sentiment-twitter-api-keys-jTbDmL
 
-Resources:
-  # EventBridgeRuleStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub
-  #       - ${BucketURL}/infrastructure/eventbridge-rule.yaml
-  #       - BucketURL: !Ref BucketURL
-  #   DependsOn:
-  #     - DataCollectionFunctionStack
-  
+Resources:  
   DataCollectionFunctionStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -31,6 +22,15 @@ Resources:
       Parameters:
         BucketName: !Ref BucketName
         TwitterAPISecret: !Ref TwitterAPISecret
+
+  EventBridgeRuleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/eventbridge-rule.yaml
+        - BucketURL: !Ref BucketURL
+    DependsOn:
+      - DataCollectionFunctionStack
   
   DynamoDBTableStack:
     Type: AWS::CloudFormation::Stack

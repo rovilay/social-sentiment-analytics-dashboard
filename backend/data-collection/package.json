@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build:zip": "pnpm run build && pnpm run zip",
+    "zip": "zip -r data-collection.zip ./dist",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

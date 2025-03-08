@@ -1,0 +1,20 @@
+{
+  "name": "sentiment-analysis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:zip": "pnpm run build && pnpm run zip",
+    "zip": "zip -r sentiment-analysis-function.zip ./dist",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-comprehend": "^3.758.0",
+    "@aws-sdk/client-dynamodb": "^3.758.0",
+    "@aws-sdk/client-kinesis": "^3.758.0"
+  }
+}

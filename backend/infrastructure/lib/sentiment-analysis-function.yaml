@@ -42,7 +42,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs22.x
       Code:
-        ZipFile: !Sub s3://${BucketName}/data-collection-function.zip
+        ZipFile: !Sub s3://${BucketName}/sentiment-analysis-function.zip
       MemorySize: 128
       Timeout: 60
       Role: !GetAtt SentimentAnalysisRole.Arn
