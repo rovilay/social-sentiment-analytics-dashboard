@@ -1,18 +1,8 @@
 Parameters:
   BucketName:
     Type: String
-    Description: Unique name for the S3 bucket
-    Default: tweet-sentiment-analytics-74f90b7a-236a-4d62
-  SentimentDataTableName:
-    Type: String
-  #   Default:
-  #     Fn::ImportValue: 'DynamoDBTableStack-SentimentDataTableName'
-  SentimentDataTableArn:
-    Type: String
-  # TweetStreamArn:
-  #   Type: String
-  #   Default:
-  #     Fn::ImportValue: 'KinesisDataStreamStack-TweetStreamArn'
+    Description: the code S3 bucket name
+
 Resources:
   SentimentAnalysisRole:
     Type: AWS::IAM::Role
@@ -42,7 +32,8 @@ Resources:
                   - dynamodb:GetItem
                   - dynamodb:UpdateItem
                   - dynamodb:DeleteItem
-                Resource: !ImportValue  DynamoDBTableStack-SentimentDataTableArn
+                Resource: 
+                  Fn::ImportValue: SentimentDataTableArn
   SentimentAnalysisFunction:
     Type: AWS::Lambda::Function
     DependsOn:
@@ -57,11 +48,5 @@ Resources:
       Role: !GetAtt SentimentAnalysisRole.Arn
       Environment:
         Variables:
-          TABLE_NAME: !Ref SentimentDataTableName
-      # Events:
-      #   KinesisStreamTrigger:
-      #     Type: Kinesis
-      #     Properties:
-      #       Stream: !Ref TweetStreamArn
-      #       BatchSize: 100
-      #       StartingPosition: LATEST
+          TABLE_NAME:
+            Fn::ImportValue: SentimentDataTableName

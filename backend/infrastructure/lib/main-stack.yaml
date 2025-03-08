@@ -13,29 +13,6 @@ Parameters:
     Default: arn:aws:secretsmanager:us-east-1:122610488400:secret:tweet-sentiment-twitter-api-keys-jTbDmL
 
 Resources:
-  # TwitterAPISecret:
-  #   Type: 'AWS::SecretsManager::Secret'
-  #   Properties:
-  #     Name: tweet-sentiment-twitter-api-keys
-
-  # S3BucketStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub s3://${BucketName}/infrastructure/s3-bucket.yaml
-
-  # IAMRolesStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub
-  #       - ${BucketURL}/infrastructure/iam-roles.yaml
-  #       - BucketURL: !Ref BucketURL
-  #     Parameters:
-  #       BucketName: !Ref BucketName
-  #       TwitterAPISecret: !Ref TwitterAPISecret
-
-    # DependsOn:
-    #   - S3BucketStack
-
   # EventBridgeRuleStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
@@ -77,7 +54,6 @@ Resources:
         - BucketURL: !Ref BucketURL
       Parameters:
         BucketName: !Ref BucketName
-      #   SentimentDataTableArn: !ImportValue DynamoDBTableStack-SentimentDataTableArn
     DependsOn:
       - DynamoDBTableStack
       - KinesisDataStreamStack

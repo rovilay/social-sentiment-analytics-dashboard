@@ -40,17 +40,6 @@ Resources:
       Handler: index.handler
       Runtime: nodejs22.x
       Role: !GetAtt DataCollectionCodeExecutionRole.Arn
-      # Policies:
-      #   - PolicyName: DataCollectionLogPolicy
-      #     PolicyDocument:
-      #       Version: '2012-10-17'
-      #       Statement:
-      #         - Effect: Allow
-      #           Action:
-      #             - logs:CreateLogGroup
-      #             - logs:CreateLogStream
-      #             - logs:PutLogEvents
-      #           Resource: arn:aws:logs:*:*:*
       Environment:
         Variables:
           TWITTER_API_KEY: !Sub '{{resolve:secretsmanager:${TwitterAPISecret}:SecretString:TWITTER_API_KEY}}'
