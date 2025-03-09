@@ -50,8 +50,11 @@ Resources:
                 Action:
                   - kinesis:PutRecord
                 Resource: !ImportValue SocialMediaDataStreamArn
+
   DataCollectionFunction:
     Type: 'AWS::Lambda::Function'
+    DependsOn:
+      - DataCollectionCodeExecutionRole
     Properties:
       Code:
         S3Bucket: !Ref BucketName
@@ -62,6 +65,7 @@ Resources:
       Timeout: 30
       LoggingConfig:
         LogGroup: '/aws/lambda/DataCollectionFunction'
+
   DataCollectionEventRole:
     Type: AWS::IAM::Role
     DependsOn:
@@ -81,11 +85,27 @@ Resources:
               - Effect: 'Allow'
                 Action: 'lambda:InvokeFunction'
                 Resource: !GetAtt DataCollectionFunction.Arn
+
+  DataCollectionEventBridgeRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: DataCollectionEventBridgeRule
+      Description: Rule to trigger DataCollection Lambda function
+      ScheduleExpression: rate(3 minutes)
+      State: ENABLED
+      Targets:
+        - Id: DataCollectionFunctionTarget
+          Arn: !GetAtt DataCollectionFunction.Arn
+          RoleArn: !GetAtt DataCollectionEventRole.Arn
 Outputs:
   DataCollectionFunctionArn:
     Value: !GetAtt DataCollectionFunction.Arn
     Export:
       Name: DataCollectionFunctionArn
+  DataCollectionFunctionName:
+    Value: !Ref DataCollectionFunction
+    Export:
+      Name: DataCollectionFunctionName
   DataCollectionEventRoleArn:
     Value: !GetAtt DataCollectionEventRole.Arn
     Export:
