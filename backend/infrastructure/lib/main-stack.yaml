@@ -32,14 +32,14 @@ Resources:
     DependsOn:
       - KinesisDataStreamStack
 
-  # EventBridgeRuleStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub
-  #       - ${BucketURL}/infrastructure/eventbridge-rule.yaml
-  #       - BucketURL: !Ref BucketURL
-  #   DependsOn:
-  #     - DataCollectionFunctionStack
+  EventBridgeRuleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/eventbridge-rule.yaml
+        - BucketURL: !Ref BucketURL
+    DependsOn:
+      - DataCollectionFunctionStack
   
   DynamoDBTableStack:
     Type: AWS::CloudFormation::Stack

@@ -4,7 +4,7 @@ Resources:
     Properties:
       Name: SocialMediaDataIngestionRule
       Description: 'Rule to trigger data ingestion every minute'
-      ScheduleExpression: 'rate(360 minutes)'
+      ScheduleExpression: 'rate(5 minutes)'
       State: 'ENABLED'
       RoleArn: !ImportValue DataCollectionEventRoleArn
       Targets:

@@ -42,6 +42,19 @@ Resources:
                 Action:
                   - s3:Object
                 Resource: !Sub arn:aws:s3:::${BucketName}/*
+        - PolicyName: SocialMediaDataStreamAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kinesis:GetRecords
+                  - kinesis:GetShardIterator
+                  - kinesis:DescribeStream
+                  - kinesis:DescribeStreamSummary
+                  - kinesis:ListShards
+                  - kinesis:ListStreams
+                Resource: !ImportValue SocialMediaDataStreamArn
         - PolicyName: SentimentAnalysisLogAccessPolicy
           PolicyDocument:
             Version: 2012-10-17
@@ -72,3 +85,10 @@ Resources:
         Variables:
           TABLE_NAME:
             Fn::ImportValue: SentimentDataTableName
+  SentimentAnalysisFunctionEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn: !ImportValue SocialMediaDataStreamArn
+      FunctionName: !Ref SentimentAnalysisFunction
+      StartingPosition: LATEST
+      BatchSize: 50
