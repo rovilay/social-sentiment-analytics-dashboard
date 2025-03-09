@@ -1,6 +1,6 @@
 import { KinesisClient, PutRecordCommand, PutRecordCommandInput } from "@aws-sdk/client-kinesis";
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
-import { EventBridgeEvent, Handler } from 'aws-lambda';
+import { Handler } from 'aws-lambda';
 import { createRestAPIClient } from 'masto';
 
 const kinesisClient = new KinesisClient({});
@@ -27,10 +27,10 @@ export const handler: Handler = async (event: any): Promise<{ statusCode: number
     })
 
     // 3. Iterate through toots and send them to Kinesis
-    const kinesisStreamName = "TootStream";
+    const kinesisStreamName = "SocialMediaDataStream";
     const encoder = new TextEncoder()
 
-    await Promise.allSettled(toots.statuses?.map((toot) => {
+    const res = await Promise.allSettled(toots.statuses?.map((toot) => {
       const text = toot.content.replace(/<[^>]+>/g, '');
       const postId = toot.id;
       const createdAt = toot.createdAt;
@@ -52,6 +52,8 @@ export const handler: Handler = async (event: any): Promise<{ statusCode: number
 
       return kinesisClient.send(new PutRecordCommand(recordParams));
     }));
+
+    console.log('RES: 🙂', res)
 
     return {
       statusCode: 200,

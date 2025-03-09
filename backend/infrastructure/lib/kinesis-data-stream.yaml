@@ -1,12 +1,12 @@
 Resources:
-  TweetStream:
+  SocialMediaDataStream:
     Type: 'AWS::Kinesis::Stream'
     Properties:
-      Name: TweetStream
+      Name: SocialMediaDataStream
       ShardCount: 1
 Outputs:
-  TweetStreamArn:
-    Value: !GetAtt TweetStream.Arn
-    Description: Kinesis data stream ARN for the tweets
+  SocialMediaDataStreamArn:
+    Value: !GetAtt SocialMediaDataStream.Arn
+    Description: Kinesis data stream ARN for the social media data
     Export:
-      Name: !Sub '${AWS::StackName}-TweetStreamArn'
+      Name: 'SocialMediaDataStreamArn'

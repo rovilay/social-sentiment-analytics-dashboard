@@ -43,7 +43,7 @@ import { Handler, KinesisStreamEvent } from "aws-lambda";
         const putItemParams = {
           TableName: "SentimentDataTable",
           Item: {
-            tootId: { S: toot.PostId },
+            DataId: { S: toot.PostId },
             Text: { S: toot.Text },
             Sentiment: { S: sentimentResponse.Sentiment || "UNKNOWN" },
             SentimentScore: {

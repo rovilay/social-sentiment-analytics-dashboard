@@ -12,7 +12,14 @@ Parameters:
     Description: Credentials
     Default: arn:aws:secretsmanager:us-east-1:122610488400:secret:social-media-analytics-secrets-manager-g0m3Pd
 
-Resources:  
+Resources:
+  KinesisDataStreamStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/kinesis-data-stream.yaml
+        - BucketURL: !Ref BucketURL
+
   DataCollectionFunctionStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -22,6 +29,8 @@ Resources:
       Parameters:
         BucketName: !Ref BucketName
         EnvVariablesAndCredentials: !Ref EnvVariablesAndCredentials
+    DependsOn:
+      - KinesisDataStreamStack
 
   # EventBridgeRuleStack:
   #   Type: AWS::CloudFormation::Stack
@@ -37,13 +46,6 @@ Resources:
     Properties:
       TemplateURL: !Sub
         - ${BucketURL}/infrastructure/dynamodb-table.yaml
-        - BucketURL: !Ref BucketURL
-
-  KinesisDataStreamStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub
-        - ${BucketURL}/infrastructure/kinesis-data-stream.yaml
         - BucketURL: !Ref BucketURL
   
   SentimentAnalysisFunctionStack:

@@ -5,11 +5,11 @@ Resources:
       TableName: SentimentDataTable
       AttributeDefinitions:
         - 
-          AttributeName: TweetId
+          AttributeName: DataId
           AttributeType: S
       KeySchema:
         - 
-          AttributeName: TweetId
+          AttributeName: DataId
           KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
