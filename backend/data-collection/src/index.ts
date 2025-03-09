@@ -1,66 +1,68 @@
 import { KinesisClient, PutRecordCommand, PutRecordCommandInput } from "@aws-sdk/client-kinesis";
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
-import Twitter from "twitter-api-v2";
+import { createRestAPIClient } from 'masto';
 
 const kinesisClient = new KinesisClient({});
 const secretsManagerClient = new SecretsManagerClient({});
 
 export const handler = async (event: any) => {
   try {
-    // 1. Retrieve Twitter API credentials from Secrets Manager
+    // 1. Retrieve API credentials from Secrets Manager
     const secretResponse = await secretsManagerClient.send(
-      new GetSecretValueCommand({ SecretId: "tweet-sentiment-twitter-api-keys" })
+      new GetSecretValueCommand({ SecretId: "social-media-analytics-secrets-manager" })
     );
     const secrets = JSON.parse(secretResponse.SecretString || "{}");
-    const twitterClient = new Twitter({
-      appKey: secrets.TWITTER_API_KEY,
-      appSecret: secrets.TWITTER_API_SECRET,
+
+    const masto = createRestAPIClient({
+      url: secrets.MASTODON_INSTANCE_URL || '',
+      accessToken: secrets.MASTODON_ACCESS_TOKEN || '',
     });
 
-    // 2. Fetch tweets based on your criteria (e.g., keywords, hashtags)
-    const tweets = await twitterClient.v2.get<{ data: any[] }>("tweets/search/recent", {
-      query: "#crypto OR #bitcoin OR #solana OR #ethereum",
-      max_results: 100,
-    });
+    // 2. Fetch toots based on your criteria (e.g., keywords, hashtags)
+    const toots = await masto.v2.search.list({
+      q: "crypto",
+      type: "statuses",
+      limit: 40
+    })
 
-    console.log("Tweet response:", tweets); 
+    // console.log("Toots response 🙂:", toots.statuses[0]);
 
-    // 3. Iterate through tweets and send them to Kinesis
-    const kinesisStreamName = "TweetStream";
+    // 3. Iterate through toots and send them to Kinesis
+    const kinesisStreamName = "TootStream";
     const encoder = new TextEncoder()
-    
-    // for (const tweet of tweets.data) {
-    //     // const blob = new Blob([JSON.stringify(tweet, null, 2)], {
-    //     //     type: "application/json",
-    //     // });
-          
-        // const recordParams: PutRecordCommandInput = {
-        //     Data: encoder.encode(),
-        //     PartitionKey: tweet.id,
-        //     StreamName: kinesisStreamName,
-        // };
-        // await kinesisClient.send(new PutRecordCommand(recordParams));
-    // }
 
-    await Promise.allSettled(tweets.data?.map((tweet) => {
-        const recordParams: PutRecordCommandInput = {
-            Data: encoder.encode(),
-            PartitionKey: tweet.id,
-            StreamName: kinesisStreamName,
-        };
+    await Promise.allSettled(toots.statuses?.map((toot) => {
+      const text = toot.content.replace(/<[^>]+>/g, '');
+      const postId = toot.id;
+      const createdAt = toot.createdAt;
+      const authorUsername = toot.account.username;
 
-        return kinesisClient.send(new PutRecordCommand(recordParams));
-    }))
+      const data = {
+        PostId: postId,
+        Text: text,
+        CreatedAt: createdAt,
+        AuthorUsername: authorUsername,
+      }
+
+      // Prepare data for Kinesis
+      const recordParams: PutRecordCommandInput = {
+        Data: encoder.encode(JSON.stringify(data)),
+        PartitionKey: postId,
+        StreamName: kinesisStreamName
+      };
+
+      return kinesisClient.send(new PutRecordCommand(recordParams));
+    }));
 
     return {
       statusCode: 200,
-      body: "Successfully sent tweets to Kinesis",
+      body: "Successfully sent toots to Kinesis",
     };
   } catch (error) {
-    console.error("Error processing tweets:", error);
+    console.error("Error processing toots:", error);
     return {
       statusCode: 500,
-      body: "Error processing tweets",
+      body: "Error processing toots",
     };
   }
 };

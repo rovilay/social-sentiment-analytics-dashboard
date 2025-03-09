@@ -7,10 +7,10 @@ Parameters:
     Type: String
     Description: S3 bucket URL
     Default: https://tweet-sentiment-analytics-74f90b7a-236a-4d62.s3.us-east-1.amazonaws.com
-  TwitterAPISecret:
+  EnvVariablesAndCredentials:
     Type: String
-    Description: Twitter credentials
-    Default: arn:aws:secretsmanager:us-east-1:122610488400:secret:tweet-sentiment-twitter-api-keys-jTbDmL
+    Description: Credentials
+    Default: arn:aws:secretsmanager:us-east-1:122610488400:secret:social-media-analytics-secrets-manager-g0m3Pd
 
 Resources:  
   DataCollectionFunctionStack:
@@ -21,16 +21,16 @@ Resources:
         - BucketURL: !Ref BucketURL
       Parameters:
         BucketName: !Ref BucketName
-        TwitterAPISecret: !Ref TwitterAPISecret
+        EnvVariablesAndCredentials: !Ref EnvVariablesAndCredentials
 
-  EventBridgeRuleStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub
-        - ${BucketURL}/infrastructure/eventbridge-rule.yaml
-        - BucketURL: !Ref BucketURL
-    DependsOn:
-      - DataCollectionFunctionStack
+  # EventBridgeRuleStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub
+  #       - ${BucketURL}/infrastructure/eventbridge-rule.yaml
+  #       - BucketURL: !Ref BucketURL
+  #   DependsOn:
+  #     - DataCollectionFunctionStack
   
   DynamoDBTableStack:
     Type: AWS::CloudFormation::Stack

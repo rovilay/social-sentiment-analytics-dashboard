@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "s3:deploy": "concurrently 'pnpm run s3:deploy:data-collection' 'pnpm run s3:deploy:sentiment-analysis' 'pnpm run s3:deploy:infra'",
+    "s3:deploy:infra": "aws s3 cp backend/infrastructure/lib/ s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/infrastructure/ --recursive",
+    "s3:deploy:data-collection": "cd backend/data-collection && pnpm run s3:deploy",
+    "s3:deploy:sentiment-analysis": "cd backend/sentiment-analysis && pnpm run s3:deploy",
     "prep:deploy": "concurrently 'pnpm run prep:deploy:data-collection' 'pnpm run prep:deploy:sentiment-analayis'",
     "prep:deploy:data-collection": "cd backend/data-collection && pnpm run build:zip",
     "prep:deploy:sentiment-analayis": "cd backend/sentiment-analysis && pnpm run build:zip",

@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "s3:deploy": "aws s3 cp ./sentiment-analysis-function.zip s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/sentiment-analysis-function.zip",
     "build:zip": "pnpm run build && pnpm run zip",
     "zip": "zip -r sentiment-analysis-function.zip ./dist",
     "build": "tsc",

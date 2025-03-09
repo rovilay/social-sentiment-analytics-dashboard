@@ -18,26 +18,31 @@ import {
         })
       );
   
-      // 2. Process each record (tweet)
+      // 2. Process each record (toot)
       for (const record of records.Records || []) {
         if (!record.Data) continue
         
-        const tweet = JSON.parse(record.Data?.toString());
+        const toot: {
+          PostId: string,
+          Text: string,
+          AuthorUsername: string,
+          CreatedAt: string
+        } = JSON.parse(record.Data?.toString());
   
         // 3. Detect sentiment using Comprehend
         const sentimentResponse = await comprehendClient.send(
           new DetectSentimentCommand({
-            LanguageCode: "en", // Replace with appropriate language code
-            Text: tweet.text,
+            LanguageCode: "en",
+            Text: toot.Text,
           })
         );
   
-        // 4. Store tweet and sentiment in DynamoDB
+        // 4. Store toot and sentiment in DynamoDB
         const putItemParams = {
           TableName: "SentimentDataTable",
           Item: {
-            TweetId: { S: tweet.id },
-            Text: { S: tweet.text },
+            tootId: { S: toot.PostId },
+            Text: { S: toot.Text },
             Sentiment: { S: sentimentResponse.Sentiment || "UNKNOWN" },
             SentimentScore: {
               M: {

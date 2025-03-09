@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "s3:deploy": "aws s3 cp ./data-collection-function.zip s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/data-collection-function.zip",
     "build:zip": "pnpm run build && pnpm run zip",
-    "zip": "zip -r data-collection.zip ./dist",
-    "build": "tsc",
+    "zip": "zip -r data-collection-function.zip ./dist",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --outfile=dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,12 +15,13 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^22.13.9",
+    "esbuild": "^0.25.0",
     "typescript": "^5.8.2"
   },
   "dependencies": {
     "@aws-sdk/client-kinesis": "^3.758.0",
     "@aws-sdk/client-secrets-manager": "^3.758.0",
     "aws-sdk": "^2.1692.0",
-    "twitter-api-v2": "^1.20.2"
+    "masto": "^6.10.3"
   }
 }

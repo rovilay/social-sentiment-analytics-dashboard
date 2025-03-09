@@ -2,9 +2,9 @@ Parameters:
   BucketName:
     Type: String
     Description: Unique name for the S3 bucket
-  TwitterAPISecret:
+  EnvVariablesAndCredentials:
     Type: String
-    Description: Twitter credentials
+    Description: Env Variables and credentials manager
 Resources:
   DataCollectionCodeExecutionRole:
     Type: AWS::IAM::Role
@@ -25,13 +25,24 @@ Resources:
                   - s3:GetItem
                 Resource: !Sub arn:aws:s3:::${BucketName}/data-collection-function.zip
                   - !Ref BucketName
-        - PolicyName: AccessTwitterSecrets
+        - PolicyName: AccessEnvVariablesAndCredentials
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action: secretsmanager:GetSecretValue
-                Resource: !Ref TwitterAPISecret
+                Resource: !Ref EnvVariablesAndCredentials
+        - PolicyName: DataCollectionLogAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - arn:aws:logs:*:*:*
   DataCollectionFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -40,10 +51,9 @@ Resources:
       Handler: index.handler
       Runtime: nodejs22.x
       Role: !GetAtt DataCollectionCodeExecutionRole.Arn
-      Environment:
-        Variables:
-          TWITTER_API_KEY: !Sub '{{resolve:secretsmanager:${TwitterAPISecret}:SecretString:TWITTER_API_KEY}}'
-          TWITTER_API_SECRET: !Sub '{{resolve:secretsmanager:${TwitterAPISecret}:SecretString:TWITTER_API_SECRET}}'
+      Timeout: 30
+      LoggingConfig:
+        LogGroup: '/aws/lambda/DataCollectionFunction'
   DataCollectionEventRole:
     Type: AWS::IAM::Role
     DependsOn:
