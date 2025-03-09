@@ -1,11 +1,12 @@
 import { KinesisClient, PutRecordCommand, PutRecordCommandInput } from "@aws-sdk/client-kinesis";
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
+import { EventBridgeEvent, Handler } from 'aws-lambda';
 import { createRestAPIClient } from 'masto';
 
 const kinesisClient = new KinesisClient({});
 const secretsManagerClient = new SecretsManagerClient({});
 
-export const handler = async (event: any) => {
+export const handler: Handler = async (event: any): Promise<{ statusCode: number, body: string }> => {
   try {
     // 1. Retrieve API credentials from Secrets Manager
     const secretResponse = await secretsManagerClient.send(
@@ -24,8 +25,6 @@ export const handler = async (event: any) => {
       type: "statuses",
       limit: 40
     })
-
-    // console.log("Toots response 🙂:", toots.statuses[0]);
 
     // 3. Iterate through toots and send them to Kinesis
     const kinesisStreamName = "TootStream";

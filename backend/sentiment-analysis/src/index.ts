@@ -4,17 +4,19 @@ import {
   } from "@aws-sdk/client-comprehend";
   import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
   import { KinesisClient, GetRecordsCommand } from "@aws-sdk/client-kinesis";
+import { Handler, KinesisStreamEvent } from "aws-lambda";
   
   const comprehendClient = new ComprehendClient({});
   const dynamoDBClient = new DynamoDBClient({});
   const kinesisClient = new KinesisClient({});
   
-  export const handler = async (event: any) => {
+  export const handler: Handler = async (event: KinesisStreamEvent) => {
     try {
+      console.log('Event: 🙂', event)
       // 1. Get records from Kinesis stream
       const records = await kinesisClient.send(
         new GetRecordsCommand({
-          ShardIterator: event.Records[0].kinesis.shardId,
+          ShardIterator: event.Records[0].kinesis.partitionKey,
         })
       );
   

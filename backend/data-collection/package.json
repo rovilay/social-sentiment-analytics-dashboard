@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "s3:deploy": "aws s3 cp ./data-collection-function.zip s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/data-collection-function.zip",
-    "build:zip": "pnpm run build && pnpm run zip",
+    "s3:deploy": "aws s3 cp ./dist/data-collection-function.zip s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/data-collection-function.zip",
+    "build:zip": "pnpm run build",
     "zip": "zip -r data-collection-function.zip ./dist",
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --outfile=dist/index.js",
+    "prebuild": "rm -rf dist",
+    "build": "esbuild ./src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "postbuild": "cd dist && zip -r data-collection-function.zip index.js*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -21,6 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-kinesis": "^3.758.0",
     "@aws-sdk/client-secrets-manager": "^3.758.0",
+    "@types/aws-lambda": "^8.10.147",
     "aws-sdk": "^2.1692.0",
     "masto": "^6.10.3"
   }

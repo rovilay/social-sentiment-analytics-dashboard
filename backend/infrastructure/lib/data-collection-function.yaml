@@ -22,9 +22,8 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - s3:GetItem
-                Resource: !Sub arn:aws:s3:::${BucketName}/data-collection-function.zip
-                  - !Ref BucketName
+                  - s3:Object
+                Resource: !Sub arn:aws:s3:::${BucketName}/*
         - PolicyName: AccessEnvVariablesAndCredentials
           PolicyDocument:
             Version: '2012-10-17'
@@ -47,7 +46,8 @@ Resources:
     Type: 'AWS::Lambda::Function'
     Properties:
       Code:
-        ZipFile: !Sub s3://${BucketName}/data-collection-function.zip
+        S3Bucket: !Ref BucketName
+        S3Key: data-collection-function.zip
       Handler: index.handler
       Runtime: nodejs22.x
       Role: !GetAtt DataCollectionCodeExecutionRole.Arn

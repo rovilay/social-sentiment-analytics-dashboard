@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "s3:deploy": "aws s3 cp ./sentiment-analysis-function.zip s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/sentiment-analysis-function.zip",
-    "build:zip": "pnpm run build && pnpm run zip",
+    "s3:deploy": "aws s3 cp ./dist/sentiment-analysis-function.zip s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/sentiment-analysis-function.zip",
+    "build:zip": "pnpm run build",
     "zip": "zip -r sentiment-analysis-function.zip ./dist",
-    "build": "tsc",
+    "prebuild": "rm -rf dist",
+    "build": "esbuild ./src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "postbuild": "cd dist && zip -r sentiment-analysis-function.zip index.js*",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,6 +18,8 @@
   "dependencies": {
     "@aws-sdk/client-comprehend": "^3.758.0",
     "@aws-sdk/client-dynamodb": "^3.758.0",
-    "@aws-sdk/client-kinesis": "^3.758.0"
+    "@aws-sdk/client-kinesis": "^3.758.0",
+    "@types/aws-lambda": "^8.10.147",
+    "esbuild": "^0.25.0"
   }
 }

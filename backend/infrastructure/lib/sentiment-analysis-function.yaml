@@ -34,6 +34,14 @@ Resources:
                   - dynamodb:DeleteItem
                 Resource: 
                   Fn::ImportValue: SentimentDataTableArn
+        - PolicyName: SentimentAnalysisExecutionPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:Object
+                Resource: !Sub arn:aws:s3:::${BucketName}/*
         - PolicyName: SentimentAnalysisLogAccessPolicy
           PolicyDocument:
             Version: 2012-10-17
@@ -53,7 +61,8 @@ Resources:
       Handler: index.handler
       Runtime: nodejs22.x
       Code:
-        ZipFile: !Sub s3://${BucketName}/sentiment-analysis-function.zip
+        S3Bucket: !Ref BucketName
+        S3Key: sentiment-analysis-function.zip
       MemorySize: 128
       Timeout: 60
       Role: !GetAtt SentimentAnalysisRole.Arn
