@@ -50,3 +50,23 @@ Resources:
     DependsOn:
       - DynamoDBTableStack
       - KinesisDataStreamStack
+
+  ApiHandlersFunctionStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - DynamoDBTableStack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/api-handlers-function.yaml
+        - BucketURL: !Ref BucketURL
+
+  ApiGateStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - ApiHandlersFunctionStack
+    Properties:
+      TemplateURL: !Sub
+        - ${BucketURL}/infrastructure/api-gateway.yaml
+        - BucketURL: !Ref BucketURL
+      Parameters:
+        ApiDefinitionUri: !Sub s3::${BucketURL}/apis/api-definition.yaml

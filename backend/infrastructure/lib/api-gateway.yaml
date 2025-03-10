@@ -1,0 +1,20 @@
+Parameters:
+  ApiDefinitionUri:
+    Type: String
+    Description: the s3 bucket uri to the api definition
+
+Resources:
+  SentimentAPI:
+      Type: AWS::Serverless::Api
+      Properties:
+        StageName: Dev
+        DefinitionUri: !Ref ApiDefinitionUri
+
+  ApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ApiHandlersFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SentimentAPI}/*/*/*
+

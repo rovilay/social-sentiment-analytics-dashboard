@@ -1,0 +1,15 @@
+openapi: 3.0.1
+info:
+  title: SentimentAPI
+paths:
+  /sentiment/{keyword}:
+    get:
+      x-amazon-apigateway-integration:
+        httpMethod: GET
+        type: aws_proxy
+        uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlersFunction.Arn}/invocations
+      parameters:
+        - in: query
+          name: sentiment
+          schema:
+            type: string

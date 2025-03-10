@@ -1,0 +1,51 @@
+Parameters:
+  BucketName:
+    Type: String
+    Description: the code S3 bucket name
+
+Resources:
+  ApiHandlersCodeExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ApiHandlersDynamoDBAccessPolicy
+          PolicyDocument:
+            Version: 2021-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dyanmodb:GetItem
+                Resource: !ImportValue SentimentDataTableArn
+        - PolicyName: ApiHandlersLogAccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - arn:aws:log:*:*:*
+  ApiHandlersFunction:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - ApiHandlersCodeExecutionRole
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Code:
+        S3Bucket:  !Ref BucketName
+        S3Key: api-handlers-function.zip
+      MemorySize: 128
+      Timeout: 60
+      Role: !GetAtt ApiHandlersCodeExecutionRole.Arn
+      LoggingConfig:
+        LogGroup: '/aws/lambda/ApiHandlersFunction'
+      

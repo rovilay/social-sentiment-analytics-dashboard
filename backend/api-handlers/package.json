@@ -1,0 +1,24 @@
+{
+  "name": "api-handlers",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "s3:deploy": "concurrently 'pnpm run s3:deploy:api-def' 'pnpm run s3:deploy:handler'",
+    "s3:deploy:api-def": "aws s3 cp ./api-definition.yaml s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/apis/api-definition.yaml",
+    "s3:deploy:handler": "aws s3 cp ./dist/sentiment-analysis-function.zip s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/sentiment-analysis-function.zip",
+    "prebuild": "rm -rf dist",
+    "build": "esbuild ./src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
+    "postbuild": "cd dist && zip -r sentiment-analysis-function.zip index.js*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.758.0",
+    "@types/aws-lambda": "^8.10.147"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
