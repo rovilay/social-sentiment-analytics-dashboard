@@ -4,16 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "s3:deploy": "concurrently 'pnpm run s3:deploy:data-collection' 'pnpm run s3:deploy:sentiment-analysis' 'pnpm run s3:deploy:infra'",
+    "build:deploy": "pnpm run build && pnpm run s3:deploy",
+    "s3:deploy": "concurrently 'pnpm run s3:deploy:data-collection' 'pnpm run s3:deploy:sentiment-analysis' 'pnpm run s3:deploy:infra' 'pnpm run s3:deploy:api-handlers'",
     "s3:deploy:infra": "aws s3 cp backend/infrastructure/lib/ s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/infrastructure/ --recursive",
     "s3:deploy:data-collection": "cd backend/data-collection && pnpm run s3:deploy",
     "s3:deploy:sentiment-analysis": "cd backend/sentiment-analysis && pnpm run s3:deploy",
-    "prep:deploy": "concurrently 'pnpm run prep:deploy:data-collection' 'pnpm run prep:deploy:sentiment-analayis'",
-    "prep:deploy:data-collection": "cd backend/data-collection && pnpm run build:zip",
-    "prep:deploy:sentiment-analayis": "cd backend/sentiment-analysis && pnpm run build:zip",
-    "build": "concurrently 'pnpm run build:data-collection' 'pnpm run build:sentiment-analysis'",
+    "s3:deploy:api-handlers": "cd backend/api-handlers && pnpm run s3:deploy",
+    "build": "concurrently 'pnpm run build:data-collection' 'pnpm run build:sentiment-analysis' 'pnpm run build:api-handlers'",
     "build:data-collection": "cd backend/data-collection && pnpm run build",
-    "build:sentiment-analysis": "cd backend/sentiment-analysis && pnpm run build"
+    "build:sentiment-analysis": "cd backend/sentiment-analysis && pnpm run build",
+    "build:api-handlers": "cd backend/api-handlers && pnpm run build"
   },
   "keywords": [],
   "author": "",
