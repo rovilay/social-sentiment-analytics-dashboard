@@ -19,9 +19,9 @@ Outputs:
     Value: !Ref SentimentDataTable
     Description: Name of the Sentiment data table
     Export:
-      Name: !Sub 'SentimentDataTableName'
+      Name: SentimentDataTableName
   SentimentDataTableArn:
     Value: !GetAtt SentimentDataTable.Arn
     Description: ARN of the Sentiment data table
     Export: 
-      Name: !Sub 'SentimentDataTableArn'
+      Name: SentimentDataTableArn

@@ -59,8 +59,19 @@ Resources:
       TemplateURL: !Sub
         - ${BucketURL}/infrastructure/api-handlers-function.yaml
         - BucketURL: !Ref BucketURL
+      Parameters:
+        BucketName: !Ref BucketName
 
-  ApiGateStack:
+  # TestApiGatewayStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   DependsOn:
+  #     - ApiHandlersFunctionStack
+  #   Properties:
+  #     TemplateURL: !Sub
+  #       - ${BucketURL}/infrastructure/test-gateway.yaml
+  #       - BucketURL: !Ref BucketURL
+
+  ApiGatewayStack:
     Type: AWS::CloudFormation::Stack
     DependsOn:
       - ApiHandlersFunctionStack

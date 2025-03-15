@@ -5,13 +5,15 @@ const TABLE_NAME = 'SentimentDataTable';
 const VALID_SENTIMENTS = ['POSITIVE', 'NEGATIVE', 'NEUTRAL', 'MIXED'];
 const dynamoDBClient = new DynamoDBClient({});
 
-export const handler = async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  console.log(event, '🙂Event')
+
   try {
     // 1. Extract relevant data from the API Gateway event
-    const { httpMethod, path, queryStringParameters } = event;
+    const { httpMethod, requestContext, queryStringParameters } = event;
 
     // 2. Determine the requested action based on the path or method
-    if (httpMethod === 'GET' && path === '/sentiment/{keyword}') {
+    if (httpMethod === 'GET' && requestContext.resourcePath === '/sentiment/{keyword}') {
         // 3. Validate keyword parameter
         const keyword = event.pathParameters?.keyword;
         if (!keyword) {
@@ -24,11 +26,12 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
           return { statusCode: 400, body: JSON.stringify({ error: `Invalid sentitment value: allowed values are ${VALID_SENTIMENTS}` }) };
         }
 
-      // 5. Fetch data from DynamoDB based on the request
-      const sentimentData = await getSentimentData(keyword, sentiment);
+        // 5. Fetch data from DynamoDB based on the request
+        const sentimentData = await getSentimentData(keyword, sentiment);
+        console.log(sentimentData, '❌sentimentData❌', event)
 
-      // 6. Format the response
-      return { statusCode: 200, body: JSON.stringify(sentimentData) };
+        // 6. Format the response
+        return { statusCode: 200, body: JSON.stringify(sentimentData ?? []) };
     }
 
 
@@ -40,18 +43,19 @@ export const handler = async (event: APIGatewayProxyEvent, context: Context): Pr
 };
 
 const getSentimentData = async (keyword: string, sentiment?: string) => {
-    let statement = `SELECT * FROM "${TABLE_NAME}" WHERE Sentiment = '${sentiment}' AND contains(Text, ${keyword})`
+    let statement = `SELECT * FROM "${TABLE_NAME}" WHERE Sentiment = '${sentiment}' AND contains(Text, '${keyword}')`
 
     if (!sentiment) {
-        statement = `SELECT * FROM "${TABLE_NAME}" WHERE contains(Text, ${keyword})`
+        statement = `SELECT * FROM "${TABLE_NAME}" WHERE contains(Text, '${keyword}')`
     }
 
     // Execute the PartiQL statement
     const command = new ExecuteStatementCommand({
-        Statement: `SELECT * FROM "${TABLE_NAME}" WHERE Sentiment = '${sentiment}' AND contains(Text, ${keyword})`,
+        Statement: statement,
     });
 
     const response = await dynamoDBClient.send(command);
+    console.log(response, 'response❌', statement)
 
-    response.Items;
+    return response.Items;
 };

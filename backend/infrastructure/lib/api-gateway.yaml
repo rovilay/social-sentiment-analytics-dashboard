@@ -1,20 +1,79 @@
 Parameters:
   ApiDefinitionUri:
     Type: String
-    Description: the s3 bucket uri to the api definition
+    Description: The S3 bucket URI to the API definition
+  apiGatewayName:
+    Type: String
+    Default: SentimentAPI
+  apiGatewayStageName:
+    Type: String
+    AllowedPattern: '[a-z0-9]+'
+    Default: dev
+  apiGatewayHTTPMethod:
+    Type: String
+    Default: GET
 
 Resources:
   SentimentAPI:
-      Type: AWS::Serverless::Api
-      Properties:
-        StageName: Dev
-        DefinitionUri: !Ref ApiDefinitionUri
-
-  ApiGatewayPermission:
-    Type: AWS::Lambda::Permission
+    Type: AWS::ApiGateway::RestApi
     Properties:
-      FunctionName: !Ref ApiHandlersFunction
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SentimentAPI}/*/*/*
+      Name: SentimentAPI
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
 
+  SentimentAPIResource:
+    Type: AWS::ApiGateway::Resource
+    DependsOn:
+      - SentimentAPI
+    Properties:
+      RestApiId: !Ref SentimentAPI
+      ParentId: !GetAtt SentimentAPI.RootResourceId
+      PathPart: 'sentiment'
+
+  SentimentKeywordResource:
+    Type: AWS::ApiGateway::Resource
+    DependsOn:
+      - SentimentAPI
+      - SentimentAPIPermission
+    Properties:
+      RestApiId: !Ref SentimentAPI
+      ParentId: !Ref SentimentAPIResource
+      PathPart: '{keyword}'
+
+  SentimentAPIMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      ApiKeyRequired: false
+      HttpMethod: !Ref apiGatewayHTTPMethod
+      RequestParameters:
+        method.request.path.keyword: true
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub 
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ApiHandlersFunctionArn}/invocations
+          - ApiHandlersFunctionArn: !ImportValue ApiHandlersFunctionArn
+      RestApiId: !Ref SentimentAPI
+      ResourceId: !Ref SentimentKeywordResource
+
+  SentimentAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: SentimentAPIMethod
+    Properties:
+      RestApiId: !Ref SentimentAPI
+      StageName: !Ref apiGatewayStageName
+
+  SentimentAPIPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: SentimentAPI
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !ImportValue ApiHandlersFunctionName
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SentimentAPI.RestApiId}/*/*
+
+Outputs:
+  apiGatewayInvokeURL:
+    Value: !Sub https://${SentimentAPI}.execute-api.${AWS::Region}.amazonaws.com/${apiGatewayStageName}
