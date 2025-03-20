@@ -7,6 +7,11 @@ const dynamoDBClient = new DynamoDBClient({});
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log(event, '🙂Event')
+  const headers = {
+    "Access-Control-Allow-Headers" : "Content-Type",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+}
 
   try {
     // 1. Extract relevant data from the API Gateway event
@@ -31,14 +36,14 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         console.log(sentimentData, '❌sentimentData❌', event)
 
         // 6. Format the response
-        return { statusCode: 200, body: JSON.stringify(sentimentData ?? []) };
+        return { statusCode: 200, headers, body: JSON.stringify(sentimentData ?? []) };
     }
 
 
-    return { statusCode: 404, body: JSON.stringify({ error: 'Not found' }) };
+    return { statusCode: 404, headers, body: JSON.stringify({ error: 'Not found' }) };
   } catch (error) {
     console.error('Error processing request:', error);
-    return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal server error' }) };
   }
 };
 
