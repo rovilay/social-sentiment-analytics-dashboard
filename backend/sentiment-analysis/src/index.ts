@@ -44,6 +44,8 @@ export const handler: Handler = async (event: KinesisStreamEvent) => {
           Item: {
             DataId: { S: toot.PostId },
             Text: { S: toot.Text },
+            AuthorUsername: { S: toot.AuthorUsername },
+            CreatedAt: { S: toot.CreatedAt },
             Sentiment: { S: sentimentResponse.Sentiment || "UNKNOWN" },
             SentimentScore: {
               M: {
