@@ -13,12 +13,19 @@
     "build": "concurrently 'pnpm run build:data-collection' 'pnpm run build:sentiment-analysis' 'pnpm run build:api-handlers'",
     "build:data-collection": "cd backend/data-collection && pnpm run build",
     "build:sentiment-analysis": "cd backend/sentiment-analysis && pnpm run build",
-    "build:api-handlers": "cd backend/api-handlers && pnpm run build"
+    "build:api-handlers": "cd backend/api-handlers && pnpm run build",
+    "install:all": "concurrently 'pnpm install' 'pnpm run install:data-collection' 'pnpm run install:sentiment-analysis' 'pnpm run install:api-handlers'",
+    "install:data-collection": "cd backend/data-collection && pnpm install",
+    "install:sentiment-analysis": "cd backend/sentiment-analysis && pnpm install",
+    "install:api-handlers": "cd backend/api-handlers && pnpm install"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "sentiment-analytics-dashboard": "link:"
   }
 }

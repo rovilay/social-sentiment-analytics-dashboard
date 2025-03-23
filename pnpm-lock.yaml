@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      sentiment-analytics-dashboard:
+        specifier: 'link:'
+        version: 'link:'
     devDependencies:
       concurrently:
         specifier: ^9.1.2
