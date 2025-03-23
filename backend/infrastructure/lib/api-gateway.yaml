@@ -40,31 +40,6 @@ Resources:
       ParentId: !Ref SentimentAPIResource
       PathPart: '{keyword}'
 
-  # CORSOptionsMethod: # Adds cors
-  #   Type: "AWS::ApiGateway::Method"
-  #   DependsOn:
-  #     - SentimentAPI
-  #   Properties:
-  #     HttpMethod: OPTIONS
-  #     AuthorizationType: NONE
-  #     Integration:
-  #       Type: MOCK
-  #       IntegrationResponses:
-  #           - StatusCode: 200
-  #       PassthroughBehavior: NEVER
-  #       RequestTemplates:
-  #         application/json: '{"statusCode": 200}'
-  #     MethodResponses:
-  #       - ResponseModels:
-  #           application/json: Empty
-  #         ResponseParameters:
-  #           "method.response.header.Access-Control-Allow-Origin": "'*'"
-  #           "method.response.header.Access-Control-Allow-Headers": "'Content-Type'"
-  #           "method.response.header.Access-Control-Allow-Methods": "'GET,POST,OPTIONS'" # Add other methods as needed
-  #         StatusCode: '200'
-  #     RestApiId: !Ref SentimentAPI
-  #     ResourceId: !Ref SentimentKeywordResource
-
   SentimentAPIMethod:
     Type: AWS::ApiGateway::Method
     DependsOn:
