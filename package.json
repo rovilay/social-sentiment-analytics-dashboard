@@ -1,12 +1,12 @@
 {
-  "name": "tweet-sentiment-analytics-dashboard",
+  "name": "sentiment-analytics-dashboard",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build:deploy": "pnpm run build && pnpm run s3:deploy",
     "s3:deploy": "concurrently 'pnpm run s3:deploy:data-collection' 'pnpm run s3:deploy:sentiment-analysis' 'pnpm run s3:deploy:infra' 'pnpm run s3:deploy:api-handlers'",
-    "s3:deploy:infra": "aws s3 cp backend/infrastructure/lib/ s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/infrastructure/ --recursive",
+    "s3:deploy:infra": "aws s3 cp backend/infrastructure/lib/ s3://sentiment-analytics-74f90b7a-236a-4d62/infrastructure/ --recursive",
     "s3:deploy:data-collection": "cd backend/data-collection && pnpm run s3:deploy",
     "s3:deploy:sentiment-analysis": "cd backend/sentiment-analysis && pnpm run s3:deploy",
     "s3:deploy:api-handlers": "cd backend/api-handlers && pnpm run s3:deploy",

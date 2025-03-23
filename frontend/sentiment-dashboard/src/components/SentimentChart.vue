@@ -14,8 +14,6 @@
     return props.sentimentData
   })
 
-  console.log(sentimentData, '🙂')
-
   const chartData = computed(() => {
     const sentiments: {
       [key: string]: {

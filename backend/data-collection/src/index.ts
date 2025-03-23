@@ -53,8 +53,6 @@ export const handler: Handler = async (event: any): Promise<{ statusCode: number
       return kinesisClient.send(new PutRecordCommand(recordParams));
     }));
 
-    console.log('RES: 🙂', res)
-
     return {
       statusCode: 200,
       body: "Successfully sent toots to Kinesis",

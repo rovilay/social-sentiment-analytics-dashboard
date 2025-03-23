@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "s3:deploy": "aws s3 cp ./dist/sentiment-analysis-function.zip s3://tweet-sentiment-analytics-74f90b7a-236a-4d62/sentiment-analysis-function.zip",
+    "s3:deploy": "aws s3 cp ./dist/sentiment-analysis-function.zip s3://sentiment-analytics-74f90b7a-236a-4d62/sentiment-analysis-function.zip",
     "prebuild": "rm -rf dist",
     "build": "esbuild ./src/index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
     "postbuild": "cd dist && zip -r sentiment-analysis-function.zip index.js*"

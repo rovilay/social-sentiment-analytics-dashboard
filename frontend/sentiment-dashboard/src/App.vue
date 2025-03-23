@@ -10,13 +10,10 @@ const apiUrl = import.meta.env.VITE_SENTIMENT_API;
 
 const fetchSentimentData = async () => {
   try {
-    console.log('Fetching sentiment data for keyword:', apiUrl);
     const response = await axios.get<SentimentData[]>(
       `${apiUrl}/sentiment/${keyword.value}`
     );
     state.sentimentData = [...response.data.slice(0, 15)];
-    
-    console.log('Sentiment data:', state.sentimentData);
   } catch (error) {
     console.error('Error fetching sentiment data:', error);
   }

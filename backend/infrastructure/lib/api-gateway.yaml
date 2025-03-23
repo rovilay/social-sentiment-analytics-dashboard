@@ -1,7 +1,4 @@
 Parameters:
-  ApiDefinitionUri:
-    Type: String
-    Description: The S3 bucket URI to the API definition
   apiGatewayName:
     Type: String
     Default: SentimentAPI

@@ -2,11 +2,11 @@ Parameters:
   BucketName:
     Type: String
     Description: Unique name for the S3 bucket
-    Default: tweet-sentiment-analytics-74f90b7a-236a-4d62
+    Default: sentiment-analytics-74f90b7a-236a-4d62
   BucketURL:
     Type: String
     Description: S3 bucket URL
-    Default: https://tweet-sentiment-analytics-74f90b7a-236a-4d62.s3.us-east-1.amazonaws.com
+    Default: https://sentiment-analytics-74f90b7a-236a-4d62.s3.amazonaws.com
   EnvVariablesAndCredentials:
     Type: String
     Description: Credentials
@@ -70,5 +70,3 @@ Resources:
       TemplateURL: !Sub
         - ${BucketURL}/infrastructure/api-gateway.yaml
         - BucketURL: !Ref BucketURL
-      Parameters:
-        ApiDefinitionUri: !Sub s3::${BucketURL}/apis/api-definition.yaml

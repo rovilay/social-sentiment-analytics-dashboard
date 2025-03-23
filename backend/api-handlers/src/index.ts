@@ -6,7 +6,6 @@ const VALID_SENTIMENTS = ['POSITIVE', 'NEGATIVE', 'NEUTRAL', 'MIXED'];
 const dynamoDBClient = new DynamoDBClient({});
 
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  console.log(event, '🙂Event')
   const headers = {
     "Access-Control-Allow-Headers" : "Content-Type",
     "Access-Control-Allow-Origin": "*",
@@ -33,7 +32,6 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
         // 5. Fetch data from DynamoDB based on the request
         const sentimentData = await getSentimentData(keyword, sentiment);
-        console.log(sentimentData, '❌sentimentData❌', event)
 
         // 6. Format the response
         return { statusCode: 200, headers, body: JSON.stringify(sentimentData ?? []) };
@@ -60,7 +58,6 @@ const getSentimentData = async (keyword: string, sentiment?: string) => {
     });
 
     const response = await dynamoDBClient.send(command);
-    console.log(response, 'response❌', statement)
 
     return response.Items;
 };
